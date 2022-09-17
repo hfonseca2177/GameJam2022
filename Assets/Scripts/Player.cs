@@ -10,7 +10,11 @@ public class Player : MonoBehaviour
 {
     private Rigidbody2D _rigidbody2D;
     [SerializeField] private float _movementSpeed;
+    [SerializeField] private float _jumpForce = 10;
     private Vector2 _direction;
+    private bool IsGrounded;
+    private LayerMask _groundMask;
+    private Transform _groundCheck;
 
     public Vector3 Position => transform.position;
 
@@ -50,11 +54,17 @@ public class Player : MonoBehaviour
     }
 
     private void Update()
-    {
+    { 
+        Jump();
        OnMove();
     }
 
-    public void OnMove()
+    private void CheckGround()
+    {
+        //IsGrounded = Physics2D.OverlapCapsule(_groundCheck.position, new Vector2(1.8f, 0.3f, CapsuleCollider))
+    }
+
+    private void OnMove()
     {
         _direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         if (_direction.magnitude > 0)
@@ -62,6 +72,14 @@ public class Player : MonoBehaviour
             _rigidbody2D.velocity = new Vector2(_direction.x * _movementSpeed, _rigidbody2D.velocity.y);
         }
         
+    }
+
+    private void Jump()
+    {
+        if (Input.GetButtonUp("Jump"))
+        {
+            _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _jumpForce);
+        }
     }
 
     public void OnClick()

@@ -32,7 +32,9 @@ public class TargetableObject : MonoBehaviour
     {
         Displace(player);
         Vector3 playerVelocity = player.Velocity;
+        //_rigidbody2D.isKinematic = false;
         _rigidbody2D.AddForce(playerVelocity * _rigidbody2D.mass);
+        
     }
 
     private void Displace(Player player)
@@ -50,7 +52,6 @@ public class TargetableObject : MonoBehaviour
 
     private void OnMouseUp()
     {
-        Debug.Log("CLICKED");
         OnTargetClick?.Invoke(this);
     }
 }
