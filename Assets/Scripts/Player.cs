@@ -9,13 +9,14 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour
 {
     private Rigidbody2D _rigidbody2D;
+    private BoxCollider2D _boxCollider2D;
     [SerializeField] private float _movementSpeed;
     [SerializeField] private float _jumpForce = 10;
     [SerializeField] private float _fallForce = 1;
     private Vector2 _direction;
-    private bool IsGrounded = true;
+    private bool IsGrounded;
     [SerializeField] private LayerMask _groundMask;
-    //private Transform _groundCheck;
+
     private Vector2 _gravity;
 
     public Vector3 Position => transform.position;
@@ -32,7 +33,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        
+        _boxCollider2D = GetComponent<BoxCollider2D>();
 
     }
 
@@ -70,7 +71,10 @@ public class Player : MonoBehaviour
 
     private void CheckGround()
     {
-        IsGrounded = Physics2D.OverlapCapsule(transform.position, new Vector2(1.8f, 0.3f), CapsuleDirection2D.Horizontal, 0, _groundMask);
+        var bounds = _boxCollider2D.bounds;
+       RaycastHit2D hit = Physics2D.BoxCast(bounds.center, bounds.size, 0, Vector2.down, 1f, _groundMask);
+       IsGrounded = hit.collider != null;
+       
     }
 
     private void OnMove()
@@ -86,7 +90,7 @@ public class Player : MonoBehaviour
     private void Jump()
     {
         //Jumps
-        if (Input.GetButtonUp("Jump")) //&& IsGrounded)
+        if (IsGrounded && Input.GetButtonUp("Jump"))
         {
             _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _jumpForce);
         }
