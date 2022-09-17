@@ -11,10 +11,12 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigidbody2D;
     [SerializeField] private float _movementSpeed;
     [SerializeField] private float _jumpForce = 10;
+    [SerializeField] private float _fallForce = 1;
     private Vector2 _direction;
-    private bool IsGrounded;
-    private LayerMask _groundMask;
-    private Transform _groundCheck;
+    private bool IsGrounded = true;
+    [SerializeField] private LayerMask _groundMask;
+    //private Transform _groundCheck;
+    private Vector2 _gravity;
 
     public Vector3 Position => transform.position;
 
@@ -30,7 +32,13 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        
 
+    }
+
+    private void Start()
+    {
+        _gravity = new Vector2(0, -Physics2D.gravity.y);
     }
 
     private void OnEnable()
@@ -55,13 +63,14 @@ public class Player : MonoBehaviour
 
     private void Update()
     { 
+        CheckGround();
         Jump();
        OnMove();
     }
 
     private void CheckGround()
     {
-        //IsGrounded = Physics2D.OverlapCapsule(_groundCheck.position, new Vector2(1.8f, 0.3f, CapsuleCollider))
+        IsGrounded = Physics2D.OverlapCapsule(transform.position, new Vector2(1.8f, 0.3f), CapsuleDirection2D.Horizontal, 0, _groundMask);
     }
 
     private void OnMove()
@@ -76,9 +85,16 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        if (Input.GetButtonUp("Jump"))
+        //Jumps
+        if (Input.GetButtonUp("Jump")) //&& IsGrounded)
         {
             _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _jumpForce);
+        }
+
+        //Falling 
+        if (_rigidbody2D.velocity.y < 0)
+        {
+            _rigidbody2D.velocity -= _gravity * _fallForce * Time.deltaTime;
         }
     }
 
