@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
     [SerializeField] private bool _logAllEvents;
     
     private Rigidbody2D _rigidbody2D;
-    private BoxCollider2D _boxCollider2D;
+    private CapsuleCollider2D _boxCollider2D;
     private bool _isGrounded;
     private Vector2 _direction;
 
@@ -45,7 +45,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _boxCollider2D = GetComponent<BoxCollider2D>();
+        _boxCollider2D = GetComponent<CapsuleCollider2D>();
     }
 
     private void OnEnable()
