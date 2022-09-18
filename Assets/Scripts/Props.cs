@@ -28,7 +28,7 @@ using UnityEngine;
 
         public void StopMovement()
         {
-            _rigidbody2D.constraints = RigidbodyConstraints2D.None;
+            _rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX;
             _rigidbody2D.velocity = Vector2.zero;
         }
     }
