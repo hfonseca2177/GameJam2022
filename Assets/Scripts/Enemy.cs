@@ -1,14 +1,76 @@
 using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+/// <summary>
+/// Enemy character able to cast spells against player
+/// </summary>
 public class Enemy : TargetableObject
 {
 
-    [SerializeField] private GameObject spell;
+    [SerializeField] private Transform _launchPosition;
+    [SerializeField] private Projectile _projectile;
+    [SerializeField] private float _cooldown = 4.0f;
+    [SerializeField] private bool _isCastOnce;
+    private float _timeElapsed;
+    private bool _isCooldownUp = true;
+    private bool _spellCasted = false;
+    
 
-    public void CastSpell()
+    public static Action<Enemy> OnDeath;
+    public static Action<Enemy> OnCastSpell;
+
+    private void Update()
     {
-        Instantiate(spell, new Vector3(0, 0, 0), Quaternion.identity);
+        if (_isCastOnce) return;
+        _timeElapsed += Time.deltaTime;
+        if (!_spellCasted) return;
+        CheckCooldown();
+    }
+
+    private void CheckCooldown()
+    {
+        if (_timeElapsed > _cooldown)
+        {
+            _isCooldownUp = true;
+            _spellCasted = false;
+            _timeElapsed = 0.0f;
+        }
+        else
+        {
+            _isCooldownUp = false;
+        }
+    }
+
+    public void CastSpell(Player player)
+    {
+        if (!_isCooldownUp || (_isCastOnce && _spellCasted)) return;
+        Projectile projectile = Instantiate(_projectile, _launchPosition.position, _launchPosition.rotation);
+        _spellCasted = true;
+        OnCastSpell?.Invoke(this);
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.collider.CompareTag("Player"))
+        {
+            Player player = col.gameObject.GetComponent<Player>();
+            player.TakeDamage();
+        } else if (col.collider.CompareTag("Props"))
+        {
+            TakeDamage();
+        }
+    }
+
+    public void TakeDamage()
+    {
+        StartCoroutine(Die());
+    }
+
+    private IEnumerator Die()
+    { 
+        yield return new WaitForSeconds(2);
+        OnDeath?.Invoke(this);
+        Destroy(this);
     }
 }

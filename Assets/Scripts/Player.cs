@@ -1,24 +1,44 @@
+using System;
+using System.Collections;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
 
+/// <summary>
+/// Player character
+/// </summary>
 public class Player : MonoBehaviour
 {
-    private Rigidbody2D _rigidbody2D;
-    private BoxCollider2D _boxCollider2D;
+    
+    [Header("Movement variables")]
     [SerializeField] private float _movementSpeed;
     [SerializeField] private float _jumpForce = 10;
-    private Vector2 _direction;
-    [SerializeField] private bool IsGrounded;
     [SerializeField] private LayerMask _groundMask;
+    [SerializeField] private float _groundCheckDistance = 0.5f;
 
+    [Header("Targetable range from player")] 
+    [SerializeField] private float _range;
+    [SerializeField] private LayerMask _targetableMask;
+    [Header("Debug range")]
+    [SerializeField] private bool _enableGizmos;
+    [SerializeField] private Color _gizmosColor = Color.cyan;
+    [SerializeField] private bool _logAllEvents;
+    
+    private Rigidbody2D _rigidbody2D;
+    private BoxCollider2D _boxCollider2D;
+    private bool _isGrounded;
+    private Vector2 _direction;
+
+    //Properties
     public Vector3 Position => transform.position;
 
-    public Vector3 Velocity => _rigidbody2D.velocity;
+    public Vector2 Velocity => _rigidbody2D.velocity;
 
-    public void Displace(Vector3 newPosition)
-    {
-        _rigidbody2D.MovePosition(newPosition);
-        _rigidbody2D.velocity = Vector2.zero;
-    }
+    //Events
+    public static Action<Player> OnDeath;
+    public static Action<Player> OnDisplace;
+    public static Action<Player> OnHasAvailableTarget;
+    
+
 
     #region BuiltinMethods
 
@@ -33,43 +53,46 @@ public class Player : MonoBehaviour
         TargetableObject.OnTargetClick += OnTargetClickEvent;
     }
 
-  
 
     private void OnDisable()
     {
-
         TargetableObject.OnTargetClick -= OnTargetClickEvent;
     }
 
     private void Update()
     {
         CheckGround();
-        if (IsGrounded && Input.GetButtonDown("Jump"))
+        if (_isGrounded && Input.GetButtonDown("Jump"))
         {
             Jump();
         }
+
+        CheckValidTarget();
     }
 
     private void FixedUpdate()
     {
         OnMove();
     }
-    #endregion
     
-    private void OnTargetClickEvent(TargetableObject obj)
+    
+    private void OnDrawGizmos()
     {
-        if (obj.IsValidTarget())
-        {
-            obj.DisplaceWithForce(this);
-        }
-        
+        if (!_enableGizmos) return;
+        Gizmos.color = _gizmosColor;
+        Gizmos.DrawWireSphere(transform.position, _range);  
     }
 
+    #endregion
+
+    #region MovementRelated
+
+    
     private void CheckGround()
     {
         var bounds = _boxCollider2D.bounds;
-       RaycastHit2D hit = Physics2D.BoxCast(bounds.center, bounds.size, 0, Vector2.down, 0.5f, _groundMask);
-       IsGrounded = hit.collider != null;
+        RaycastHit2D hit = Physics2D.BoxCast(bounds.center, bounds.size, 0, Vector2.down, _groundCheckDistance, _groundMask);
+        _isGrounded = hit.collider != null;
     }
 
     private void OnMove()
@@ -77,17 +100,74 @@ public class Player : MonoBehaviour
         _direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         if (_direction.magnitude > 0)
         {
+            if(_logAllEvents) Debug.Log("OnMove");
             _rigidbody2D.velocity = new Vector2(_direction.x * _movementSpeed, _rigidbody2D.velocity.y);
         }
-        
+        Flip();
     }
 
     private void Jump()
     {
+        if(_logAllEvents) Debug.Log("Jump");
         _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
     }
 
+    #endregion
 
+    private void Flip()
+    {
+        if (_direction.x == 0) return;
+        if(_logAllEvents) Debug.Log("Flip");
+        Vector2 characterScale = transform.localScale;
+        characterScale.x = (_direction.x < 0) ? 1 : -1;
+        transform.localScale = characterScale;
+    }
+    
+    public void Displace(Vector2 newPosition)
+    {
+        if(_logAllEvents) Debug.Log("Displace");
+        _rigidbody2D.MovePosition(newPosition);
+        //_rigidbody2D.velocity = Vector2.zero;
+    }
+    
+    private void OnTargetClickEvent(TargetableObject targetable)
+    {
+        if(_logAllEvents) Debug.Log("OnTargetClickEvent");
+        if (!targetable.IsValidTarget()) return;
+        targetable.DisplaceWithForce(this);
+        OnDisplace?.Invoke(this);
+    }
+
+
+    public void RespawnAt(Vector2 checkpoint)
+    {
+        if(_logAllEvents) Debug.Log("RespawnAt");
+        _rigidbody2D.MovePosition(checkpoint);
+    }
+
+    public void TakeDamage()
+    {
+        if(_logAllEvents) Debug.Log("TakeDamage");
+        StartCoroutine(Die());
+    }
+
+    private IEnumerator Die()
+    {
+        yield return new WaitForSeconds(2);
+        OnDeath?.Invoke(this);
+    }
+    
+    private void CheckValidTarget()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, _range, _targetableMask);
+        if (hit != null)
+        {
+            /*TargetableObject[] targetableObjects = hit.GetComponents<TargetableObject>();
+            OnHasAvailableTarget?.Invoke(this, targetableObjects);*/
+            OnHasAvailableTarget?.Invoke(this);
+        }
+            
+    }
     
 
 }

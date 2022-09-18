@@ -2,22 +2,32 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Objects that can be targetable
+/// Objects that can be targetable and displaced with
 /// </summary>
+
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(BoxCollider2D))]
 public class TargetableObject : MonoBehaviour
 {
 
+    [Header("Targetable range case is different from global player range")]
     [SerializeField] private float _range;
-    private Rigidbody2D _rigidbody2D;
+    [Header("Targetable is a fixed hook just used to displace to the its position")]
     [SerializeField] private bool IsHook;
     [SerializeField] private LayerMask _playerMask;
+    [Header("Debug range")]
+    [SerializeField] private bool _enableGizmos;
+    [SerializeField] private Color _gizmosColor = Color.green;
+    //Properties
+    public Vector2 Position => transform.position;
     
+    //Variables
+    protected Rigidbody2D _rigidbody2D;
+    
+    //Events
     public static Action<TargetableObject> OnTargetClick;
-
-    [SerializeField] private Texture2D cursorTexture;
-    [SerializeField] private Texture2D cursorTextureOver;
-    public CursorMode cursorMode = CursorMode.Auto;
-    public Vector2 hotSpot = Vector2.zero;
+    public static Action<TargetableObject> OnMouseOverTargetable;
+    public static Action<TargetableObject> OnMouseExitTargetable;
 
     #region BuiltinMethods
 
@@ -25,13 +35,39 @@ public class TargetableObject : MonoBehaviour
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
+    
+    private void OnDrawGizmos()
+    {
+        if (!_enableGizmos) return;
+        Gizmos.color = _gizmosColor;
+        Gizmos.DrawWireSphere(transform.position, _range);
+    }
+    
+    
+    private void OnMouseUp()
+    {
+        OnTargetClick?.Invoke(this);
+    }
+
+    private void OnMouseOver()
+    {
+        if (IsValidTarget())
+        {
+            OnMouseOverTargetable?.Invoke(this);
+        }
+        
+    }
+
+    private void OnMouseExit()
+    {
+        if (IsValidTarget())
+        {
+            OnMouseExitTargetable?.Invoke(this);
+        }
+    }
 
     #endregion
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireSphere(transform.position, _range);  
-    }
 
     public bool IsValidTarget()
     {
@@ -43,11 +79,9 @@ public class TargetableObject : MonoBehaviour
     {
         Displace(player);
         Vector3 playerVelocity = player.Velocity;
-        if (!IsHook)
-        {
-            _rigidbody2D.constraints = RigidbodyConstraints2D.None;
-            _rigidbody2D.AddForce(playerVelocity * _rigidbody2D.mass);
-        }
+        if (IsHook) return;
+        _rigidbody2D.constraints = RigidbodyConstraints2D.None;
+        _rigidbody2D.AddForce(playerVelocity * _rigidbody2D.mass);
     }
 
     private void Displace(Player player)
@@ -61,25 +95,4 @@ public class TargetableObject : MonoBehaviour
         player.Displace(targetPosition);
     }
     
-    private void OnMouseUp()
-    {
-        OnTargetClick?.Invoke(this);
-    }
-
-    private void OnMouseOver()
-    {
-        if (IsValidTarget())
-        {
-            Cursor.SetCursor(cursorTextureOver, hotSpot, cursorMode);    
-        }
-        
-    }
-
-    private void OnMouseExit()
-    {
-        if (IsValidTarget())
-        {
-            Cursor.SetCursor(cursorTexture, hotSpot, cursorMode);
-        }
-    }
 }
