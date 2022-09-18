@@ -66,6 +66,7 @@ public class Enemy : TargetableObject
     public void TakeDamage()
     {
         StartCoroutine(Die());
+        
     }
 
     private IEnumerator Die()
@@ -73,6 +74,6 @@ public class Enemy : TargetableObject
         yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
         gameObject.SetActive(false);
-        Destroy(this);
+       
     }
 }

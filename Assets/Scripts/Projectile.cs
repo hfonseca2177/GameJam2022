@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using UnityEngine;
 
 /// <summary>
@@ -45,7 +46,7 @@ public class Projectile : TargetableObject
     
     private void Dissipate()
     {
-        Destroy(this);
+        Destroy(gameObject);
     }
 
     private void CheckLifeTime()
@@ -56,4 +57,5 @@ public class Projectile : TargetableObject
             Dissipate();
         }
     }
+    
 }
