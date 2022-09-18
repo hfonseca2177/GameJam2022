@@ -12,6 +12,7 @@ public class Enemy : TargetableObject
     [SerializeField] private Projectile _projectile;
     [SerializeField] private float _cooldown = 4.0f;
     [SerializeField] private bool _isCastOnce;
+    [SerializeField] private float _deathTime = 1.0f;
     private float _timeElapsed;
     private bool _isCooldownUp = true;
     private bool _spellCasted = false;
@@ -69,7 +70,7 @@ public class Enemy : TargetableObject
 
     private IEnumerator Die()
     { 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
         Destroy(this);
     }

@@ -32,7 +32,10 @@
             AggroBox.OnAggroRange += OnAggroRangeEvent;
             TargetableObject.OnPlayerCanTarget += OnPlayerHasTargets;
             TargetableObject.OnPlayerCannotTarget += OnPlayerLosesTarget;
+            Spike.OnEnemyHitSpike += OnEnemyHitSpikeEvent;
+            Spike.OnPlayerHitSpike += OnPlayerHitSpikeEvent;
         }
+
 
 
         private void OnDisable()
@@ -49,6 +52,8 @@
             AggroBox.OnAggroRange -= OnAggroRangeEvent;
             TargetableObject.OnPlayerCanTarget -= OnPlayerHasTargets;
             TargetableObject.OnPlayerCannotTarget -= OnPlayerLosesTarget;
+            Spike.OnEnemyHitSpike -= OnEnemyHitSpikeEvent;
+            Spike.OnPlayerHitSpike -= OnPlayerHitSpikeEvent;
         }
 
         #endregion
@@ -56,6 +61,7 @@
 
         #region CursorManipulation
 
+        
         private void OnMouseExitTargetableEvent(TargetableObject targetable)
         {
             if (_disableCursorTextures) return;
@@ -130,6 +136,17 @@
         private void OnAggroRangeEvent(Player player, Enemy enemy)
         {
             //TODO screen border red
+        }
+        
+        
+        private void OnPlayerHitSpikeEvent(Player player)
+        {
+            //TODO sfx
+        }
+
+        private void OnEnemyHitSpikeEvent(Enemy enemy)
+        {
+            //TODO sfx
         }
         
     }
