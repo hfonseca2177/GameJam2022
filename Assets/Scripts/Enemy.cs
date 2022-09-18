@@ -59,6 +59,7 @@ public class Enemy : TargetableObject
             player.TakeDamage();
         } else if (col.collider.CompareTag("Props"))
         {
+            Debug.Log(" PROP HIT");
             TakeDamage();
         }
     }
@@ -72,6 +73,8 @@ public class Enemy : TargetableObject
     { 
         yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
+        gameObject.SetActive(false);
+        Debug.Log("DEAD");
         Destroy(this);
     }
 }

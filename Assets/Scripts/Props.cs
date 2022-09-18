@@ -25,4 +25,9 @@ using UnityEngine;
             OnDestroy?.Invoke(this);
             Destroy(this);
         }
+
+        public void StopMovement()
+        {
+            _rigidbody2D.velocity = Vector2.zero;
+        }
     }
