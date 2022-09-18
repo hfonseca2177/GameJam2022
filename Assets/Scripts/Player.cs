@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        CheckValidTarget();
+        
     }
 
     private void FixedUpdate()
@@ -126,7 +126,8 @@ public class Player : MonoBehaviour
     public void Displace(Vector2 newPosition)
     {
         if(_logAllEvents) Debug.Log("Displace");
-        _rigidbody2D.MovePosition(newPosition);
+        //_rigidbody2D.MovePosition(newPosition);
+        _rigidbody2D.transform.position = newPosition;
         //_rigidbody2D.velocity = Vector2.zero;
     }
     

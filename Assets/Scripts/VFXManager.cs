@@ -22,7 +22,6 @@
         {
             Player.OnDisplace += OnPlayerDisplaceEvent;
             Player.OnDeath += OnPlayerDeathEvent;
-            Player.OnHasAvailableTarget += OnPlayerHasTargets;
             Projectile.OnProjectileHit += OnProjectileHitEvent;
             CheckpointMark.OnCheckpointEnter += OnCheckpointEnterEvent;
             TargetableObject.OnMouseOverTargetable += OnMouseOverTargetableEvent;
@@ -31,6 +30,8 @@
             Enemy.OnCastSpell += OnEnemyCastSpellEvent;
             Props.OnDestroy += OnPropsDestroyEvent;
             AggroBox.OnAggroRange += OnAggroRangeEvent;
+            TargetableObject.OnPlayerCanTarget += OnPlayerHasTargets;
+            TargetableObject.OnPlayerCannotTarget += OnPlayerLosesTarget;
         }
 
 
@@ -38,7 +39,6 @@
         {
             Player.OnDisplace -= OnPlayerDisplaceEvent;
             Player.OnDeath -= OnPlayerDeathEvent;
-            Player.OnHasAvailableTarget -= OnPlayerHasTargets;
             Projectile.OnProjectileHit -= OnProjectileHitEvent;
             CheckpointMark.OnCheckpointEnter -= OnCheckpointEnterEvent;
             TargetableObject.OnMouseOverTargetable -= OnMouseOverTargetableEvent;
@@ -47,6 +47,8 @@
             Enemy.OnCastSpell -= OnEnemyCastSpellEvent;
             Props.OnDestroy -= OnPropsDestroyEvent;
             AggroBox.OnAggroRange -= OnAggroRangeEvent;
+            TargetableObject.OnPlayerCanTarget -= OnPlayerHasTargets;
+            TargetableObject.OnPlayerCannotTarget -= OnPlayerLosesTarget;
         }
 
         #endregion
@@ -66,10 +68,16 @@
             Cursor.SetCursor(_cursorTextureOver, _hotSpot, CursorMode);
         }
         
-        private void OnPlayerHasTargets(Player player)
+        private void OnPlayerHasTargets(TargetableObject targetableObject)
         {
-            if (_disableCursorTextures) return;
-            Cursor.SetCursor(_cursorTextureInRange, _hotSpot, CursorMode);
+            /*if (_disableCursorTextures) return;
+            Cursor.SetCursor(_cursorTextureInRange, _hotSpot, CursorMode);*/
+        }
+        
+        private void OnPlayerLosesTarget(TargetableObject targetableObject)
+        {
+            /*if (_disableCursorTextures) return;
+            Cursor.SetCursor(_cursorTexture, _hotSpot, CursorMode); */
         }
 
         #endregion

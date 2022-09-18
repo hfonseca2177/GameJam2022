@@ -28,6 +28,8 @@ public class TargetableObject : MonoBehaviour
     public static Action<TargetableObject> OnTargetClick;
     public static Action<TargetableObject> OnMouseOverTargetable;
     public static Action<TargetableObject> OnMouseExitTargetable;
+    public static Action<TargetableObject> OnPlayerCanTarget;
+    public static Action<TargetableObject> OnPlayerCannotTarget;
 
     #region BuiltinMethods
 
@@ -35,7 +37,20 @@ public class TargetableObject : MonoBehaviour
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
-    
+
+    private void Update()
+    {
+        if (IsValidTarget())
+        {
+            OnPlayerCanTarget?.Invoke(this);
+        }
+        else
+        {
+            OnPlayerCannotTarget?.Invoke(this);
+        }
+
+    }
+
     private void OnDrawGizmos()
     {
         if (!_enableGizmos) return;
@@ -78,10 +93,10 @@ public class TargetableObject : MonoBehaviour
     public void DisplaceWithForce(Player player)
     {
         Displace(player);
-        Vector3 playerVelocity = player.Velocity;
+        /*Vector3 playerVelocity = player.Velocity;
         if (IsHook) return;
         _rigidbody2D.constraints = RigidbodyConstraints2D.None;
-        _rigidbody2D.AddForce(playerVelocity * _rigidbody2D.mass);
+        _rigidbody2D.AddForce(playerVelocity * _rigidbody2D.mass);*/
     }
 
     private void Displace(Player player)
@@ -90,7 +105,8 @@ public class TargetableObject : MonoBehaviour
         Vector3 targetPosition = transform.position;
         if (!IsHook)
         {
-            _rigidbody2D.MovePosition(playerPosition);
+            //_rigidbody2D.MovePosition(playerPosition);
+            _rigidbody2D.transform.position = playerPosition;
         }
         player.Displace(targetPosition);
     }
