@@ -154,5 +154,5 @@ MonoBehaviour:
   _enableGizmos: 0
   _gizmosColor: {r: 0, g: 1, b: 0, a: 1}
   _timeLife: 10
-  _launchForce: {x: 20, y: 1}
   _speed: 10
+  _isFixed: 0
