@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _gravity = new Vector2(0, -Physics2D.gravity.y);
+        Debug.Log(-Physics2D.gravity.y);
     }
 
     private void OnEnable()
@@ -63,18 +64,31 @@ public class Player : MonoBehaviour
     }
 
     private void Update()
-    { 
+    {
         CheckGround();
-        Jump();
+        if (IsGrounded && Input.GetButtonDown("Jump"))
+        {
+            Jump();
+        }
+    }
+
+    private void FixedUpdate()
+    { 
+       
+        //Jump();
        OnMove();
     }
 
     private void CheckGround()
     {
         var bounds = _boxCollider2D.bounds;
-       RaycastHit2D hit = Physics2D.BoxCast(bounds.center, bounds.size, 0, Vector2.down, 1f, _groundMask);
+       RaycastHit2D hit = Physics2D.BoxCast(bounds.center, bounds.size, 0, Vector2.down, 0.5f, _groundMask);
        IsGrounded = hit.collider != null;
-       
+       /*//Falling 
+       if (_rigidbody2D.velocity.y < 0)
+       {
+           _rigidbody2D.velocity -= _gravity * _fallForce * Time.deltaTime;
+       }*/
     }
 
     private void OnMove()
@@ -89,24 +103,11 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        //Jumps
-        if (IsGrounded && Input.GetButtonUp("Jump"))
-        {
-            _rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _jumpForce);
-        }
-
-        //Falling 
-        if (_rigidbody2D.velocity.y < 0)
-        {
-            _rigidbody2D.velocity -= _gravity * _fallForce * Time.deltaTime;
-        }
+        //_rigidbody2D.velocity = new Vector2(_rigidbody2D.velocity.x, _jumpForce);
+        _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+    
     }
 
-    public void OnClick()
-    {
-        Debug.Log("CLICk");
-        
-    }
 
     #endregion
 
