@@ -25,7 +25,7 @@ public class Projectile : TargetableObject
         Player player = col.gameObject.GetComponent<Player>();
         OnProjectileHit?.Invoke(this, player);
         player.TakeDamage();
-        Dissipate();
+        //Dissipate();
     }
 
     private void Start()
