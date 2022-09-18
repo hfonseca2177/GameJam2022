@@ -12,7 +12,7 @@ public class Enemy : TargetableObject
     [SerializeField] private Projectile _projectile;
     [SerializeField] private float _cooldown = 4.0f;
     [SerializeField] private bool _isCastOnce;
-    [SerializeField] private float _deathTime = 1.0f;
+    [SerializeField] private float _deathTime = 0.1f;
     private float _timeElapsed;
     private bool _isCooldownUp = true;
     private bool _spellCasted = false;
@@ -59,7 +59,6 @@ public class Enemy : TargetableObject
             player.TakeDamage();
         } else if (col.collider.CompareTag("Props"))
         {
-            Debug.Log(" PROP HIT");
             TakeDamage();
         }
     }
@@ -74,7 +73,6 @@ public class Enemy : TargetableObject
         yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
         gameObject.SetActive(false);
-        Debug.Log("DEAD");
         Destroy(this);
     }
 }

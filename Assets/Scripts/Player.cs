@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     [SerializeField] private bool _enableGizmos;
     [SerializeField] private Color _gizmosColor = Color.cyan;
     [SerializeField] private bool _logAllEvents;
+    [SerializeField] private float _playerDeathTime = 0.1f;
     
     private Rigidbody2D _rigidbody2D;
     private CapsuleCollider2D _boxCollider2D;
@@ -154,7 +155,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator Die()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(_playerDeathTime);
         OnDeath?.Invoke(this);
     }
     
