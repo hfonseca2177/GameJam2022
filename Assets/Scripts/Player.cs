@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float _jumpForce = 10;
     [SerializeField] private float _fallForce = 1;
     private Vector2 _direction;
-    private bool IsGrounded;
+    [SerializeField] private bool IsGrounded;
     [SerializeField] private LayerMask _groundMask;
 
     private Vector2 _gravity;
