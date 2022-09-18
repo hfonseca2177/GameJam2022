@@ -15,6 +15,8 @@
         //Mouse configuration
         private const CursorMode CursorMode = UnityEngine.CursorMode.Auto;
         private readonly Vector2 _hotSpot = Vector2.zero;
+
+        [SerializeField] private AudioSource _displaceSound;
         
         #region BuiltinMethods
 
@@ -111,7 +113,7 @@
 
         private void OnPlayerDisplaceEvent(Player player)
         {
-            //TODO play sound
+            if(_displaceSound!=null) _displaceSound.Play();
         }
         
         
