@@ -1209,7 +1209,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 120144589105589518, guid: 907b52efb2917e7409f4da0115e33d18, type: 3}
       propertyPath: _logAllEvents
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 907b52efb2917e7409f4da0115e33d18, type: 3}
