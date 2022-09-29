@@ -10,7 +10,16 @@ using UnityEngine;
         [SerializeField] private bool _destructible;
         public static Action<Props> OnDestroy;
         
-        
+        private bool _isMoving;
+        public bool IsMoving => _isMoving;
+
+
+        protected override void Update()
+        {
+            base.Update();
+            CheckIsMoving();
+        }
+
         public void TakeDamage()
         {
             if (_destructible)
@@ -31,4 +40,11 @@ using UnityEngine;
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX;
             _rigidbody2D.velocity = Vector2.zero;
         }
+
+        private void CheckIsMoving()
+        {
+            _isMoving = _rigidbody2D.velocity.magnitude > 1f;
+        }
+        
+        
     }

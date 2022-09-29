@@ -1,5 +1,6 @@
 ﻿
     using System;
+    using System.Linq;
     using UnityEngine;
     
 
@@ -12,13 +13,14 @@
         [SerializeField] private Texture2D _cursorTextureOver;
         [SerializeField] private Texture2D _cursorTextureInRange;
         [SerializeField] private bool _disableCursorTextures;
+        private CursorState _currentCursorState;
         //Mouse configuration
         private const CursorMode CursorMode = UnityEngine.CursorMode.Auto;
         private readonly Vector2 _hotSpot = Vector2.zero;
 
         [SerializeField] private AudioSource _displaceSound;
         
-        #region BuiltinMethods
+        #region BuiltinMethodsdw
 
         private void OnEnable()
         {
@@ -36,9 +38,8 @@
             TargetableObject.OnPlayerCannotTarget += OnPlayerLosesTarget;
             Spike.OnEnemyHitSpike += OnEnemyHitSpikeEvent;
             Spike.OnPlayerHitSpike += OnPlayerHitSpikeEvent;
+            OnNewCursorState(CursorState.Normal);
         }
-
-
 
         private void OnDisable()
         {
@@ -63,34 +64,102 @@
 
         #region CursorManipulation
 
-        
-        private void OnMouseExitTargetableEvent(TargetableObject targetable)
-        {
-            if (_disableCursorTextures) return;
-            Cursor.SetCursor(_cursorTexture, _hotSpot, CursorMode);
-        }
 
+        //whenever a mouse is over a targetable object
         private void OnMouseOverTargetableEvent(TargetableObject targetable)
         {
             if (_disableCursorTextures) return;
-            Cursor.SetCursor(_cursorTextureOver, _hotSpot, CursorMode);
+            OnNewCursorState(CursorState.Over);
         }
         
+        //Whenever a player has valid targets
         private void OnPlayerHasTargets(TargetableObject targetableObject)
         {
-            /*if (_disableCursorTextures) return;
-            Cursor.SetCursor(_cursorTextureInRange, _hotSpot, CursorMode);*/
+            if (_disableCursorTextures) return;
+            OnNewCursorState(CursorState.InRange);
         }
         
+        //when player exists from range of a targetable object
         private void OnPlayerLosesTarget(TargetableObject targetableObject)
         {
-            /*if (_disableCursorTextures) return;
-            Cursor.SetCursor(_cursorTexture, _hotSpot, CursorMode); */
+            if (_disableCursorTextures) return;
+            OnEndCursorState(CursorState.InRange);
+        }
+        
+        //when mouse exists a targetable object
+        private void OnMouseExitTargetableEvent(TargetableObject targetable)
+        {
+            if (_disableCursorTextures) return;
+            OnEndCursorState(CursorState.Over);
+        }
+        
+        //Start a new cursor state
+        private void OnNewCursorState(CursorState newState)
+        {
+            switch (newState)
+            {
+                case CursorState.Over:
+                    SetCursorState(CursorState.Over);
+                    break;
+                case CursorState.InRange when !CursorState.Over.Equals(_currentCursorState):
+                    SetCursorState(CursorState.InRange);
+                    break;
+                case CursorState.Normal when !CursorState.Over.Equals(_currentCursorState):
+                default:
+                    SetCursorState(CursorState.Normal);
+                    break;
+            }
+        }
+        
+        //End a cursor state
+        private void OnEndCursorState(CursorState exitState)
+        {
+            
+            //Only update the cursor if it is not OVER a target or exiting from OVER
+            if (CursorState.Over.Equals(exitState))
+            {
+                _currentCursorState = CursorState.Normal;
+            }
+            
+            if (CursorState.Over.Equals(_currentCursorState)) return;
+            
+            //check if there is still other valid target
+            using var enumerator = FindObjectsOfType<TargetableObject>().Where( to => to.gameObject.GetComponent<SpriteRenderer>().isVisible).GetEnumerator();
+
+            var stillHasTarget = false;
+            while (enumerator.MoveNext())
+            {
+                var targetableObject = enumerator.Current;
+                if (targetableObject == null || !targetableObject.IsValidTarget()) continue;
+                stillHasTarget = true;
+                break;
+            }
+            //update the cursor
+            SetCursorState(stillHasTarget ? CursorState.InRange : CursorState.Normal);
+        }
+
+        //Set the cursor texture and updates the state
+        private void SetCursorState(CursorState state)
+        {
+            switch (state)
+            {
+                case CursorState.Over:
+                    Cursor.SetCursor(_cursorTextureOver, _hotSpot, CursorMode);
+                    _currentCursorState = state;
+                    break;
+                case CursorState.InRange:
+                    Cursor.SetCursor(_cursorTextureInRange, _hotSpot, CursorMode);
+                    _currentCursorState = state;
+                    break;
+                case CursorState.Normal:
+                default:
+                    Cursor.SetCursor(_cursorTexture, _hotSpot, CursorMode);
+                    _currentCursorState = CursorState.Normal;
+                    break;
+            }
         }
 
         #endregion
-      
-
         
         private void OnCheckpointEnterEvent(Vector2 checkpoint)
         {

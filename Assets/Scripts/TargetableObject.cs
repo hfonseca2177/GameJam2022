@@ -33,12 +33,12 @@ public class TargetableObject : MonoBehaviour
 
     #region BuiltinMethods
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if (IsValidTarget())
         {
@@ -75,10 +75,11 @@ public class TargetableObject : MonoBehaviour
 
     private void OnMouseExit()
     {
-        if (IsValidTarget())
+        OnMouseExitTargetable?.Invoke(this);
+        /*if (IsValidTarget())
         {
             OnMouseExitTargetable?.Invoke(this);
-        }
+        }*/
     }
 
     #endregion

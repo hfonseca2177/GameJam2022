@@ -16,13 +16,20 @@ public class Enemy : TargetableObject
     private float _timeElapsed;
     private bool _isCooldownUp = true;
     private bool _spellCasted = false;
+    private AnimationName _animationName;
     
-
     public static Action<Enemy> OnDeath;
     public static Action<Enemy> OnCastSpell;
 
-    private void Update()
+    protected override void Awake()
     {
+        base.Awake();
+        _animationName = GetComponent<AnimationName>();
+    }
+
+    protected override void Update()
+    {
+        base.Update();
         if (_isCastOnce) return;
         _timeElapsed += Time.deltaTime;
         if (!_spellCasted) return;
@@ -66,14 +73,12 @@ public class Enemy : TargetableObject
     public void TakeDamage()
     {
         StartCoroutine(Die());
-        
     }
 
     private IEnumerator Die()
     { 
+        _animationName.PlayDeath();
         yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
-        gameObject.SetActive(false);
-       
     }
 }
