@@ -64,7 +64,7 @@ public class TargetableObject : MonoBehaviour
         OnTargetClick?.Invoke(this);
     }
 
-    private void OnMouseOver()
+    private void OnMouseEnter()
     {
         if (IsValidTarget())
         {
