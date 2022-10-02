@@ -23,6 +23,7 @@ public class TargetableObject : MonoBehaviour
     
     //Variables
     protected Rigidbody2D _rigidbody2D;
+    protected Collider2D _collider2D;
     
     //Events
     public static Action<TargetableObject> OnTargetClick;
@@ -30,12 +31,21 @@ public class TargetableObject : MonoBehaviour
     public static Action<TargetableObject> OnMouseExitTargetable;
     public static Action<TargetableObject> OnPlayerCanTarget;
     public static Action<TargetableObject> OnPlayerCannotTarget;
+    private float _targetLockRange = 2f;
+
+    public struct CollisionInfo
+    {
+        public bool InRange;
+        public bool IsTargetLocked;
+
+    }
 
     #region BuiltinMethods
 
     protected virtual void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _collider2D = GetComponent<Collider2D>();
     }
 
     protected virtual void Update()
@@ -89,6 +99,18 @@ public class TargetableObject : MonoBehaviour
     {
         Collider2D hit = Physics2D.OverlapCircle(transform.position, _range, _playerMask);
         return hit != null;
+    }
+    
+    public CollisionInfo IsValidTargetInfo()
+    {
+        CollisionInfo info;
+        var position = transform.position;
+        Collider2D hit = Physics2D.OverlapCircle(position, _range, _playerMask);
+        info.InRange = hit != null;
+        Vector3 pointer = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        float distance = Vector2.Distance(pointer, position);
+        info.IsTargetLocked = distance < _targetLockRange;
+        return info;
     }
 
     public void DisplaceWithForce(Player player)

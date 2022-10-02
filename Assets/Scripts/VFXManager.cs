@@ -38,7 +38,8 @@
             TargetableObject.OnPlayerCannotTarget += OnPlayerLosesTarget;
             Spike.OnEnemyHitSpike += OnEnemyHitSpikeEvent;
             Spike.OnPlayerHitSpike += OnPlayerHitSpikeEvent;
-            OnNewCursorState(CursorState.Normal);
+            //OnNewCursorState(CursorState.Normal);
+            SetCursorState(CursorState.Normal);
         }
 
         private void OnDisable()
@@ -69,32 +70,32 @@
         private void OnMouseOverTargetableEvent(TargetableObject targetable)
         {
             if (_disableCursorTextures) return;
-            OnNewCursorState(CursorState.Over);
+            //OnNewCursorState(CursorState.Over);
         }
         
         //Whenever a player has valid targets
         private void OnPlayerHasTargets(TargetableObject targetableObject)
         {
             if (_disableCursorTextures) return;
-            OnNewCursorState(CursorState.InRange);
+            UpdateCursorState(CursorState.InRange);
         }
         
         //when player exists from range of a targetable object
         private void OnPlayerLosesTarget(TargetableObject targetableObject)
         {
             if (_disableCursorTextures) return;
-            OnEndCursorState(CursorState.InRange);
+            UpdateCursorState(CursorState.InRange);
         }
         
         //when mouse exists a targetable object
         private void OnMouseExitTargetableEvent(TargetableObject targetable)
         {
             if (_disableCursorTextures) return;
-            OnEndCursorState(CursorState.Over);
+            //OnEndCursorState(CursorState.Over);
         }
         
         //Start a new cursor state
-        private void OnNewCursorState(CursorState newState)
+        /*private void OnNewCursorState(CursorState newState)
         {
             switch (newState)
             {
@@ -109,33 +110,44 @@
                     SetCursorState(CursorState.Normal);
                     break;
             }
-        }
+        }*/
         
         //End a cursor state
-        private void OnEndCursorState(CursorState exitState)
+        private void UpdateCursorState(CursorState exitState)
         {
             
             //Only update the cursor if it is not OVER a target or exiting from OVER
-            if (CursorState.Over.Equals(exitState))
+            /*if (CursorState.Over.Equals(exitState))
             {
                 _currentCursorState = CursorState.Normal;
             }
             
-            if (CursorState.Over.Equals(_currentCursorState)) return;
+            if (CursorState.Over.Equals(_currentCursorState)) return;*/
             
             //check if there is still other valid target
             using var enumerator = FindObjectsOfType<TargetableObject>().Where( to => to.gameObject.GetComponent<SpriteRenderer>().isVisible).GetEnumerator();
 
             var stillHasTarget = false;
+            var targetLocked = false;
             while (enumerator.MoveNext())
             {
                 var targetableObject = enumerator.Current;
-                if (targetableObject == null || !targetableObject.IsValidTarget()) continue;
+                if (targetableObject == null) continue;
+                var collisionInfo = targetableObject.IsValidTargetInfo();
+                if (!collisionInfo.InRange) continue;
                 stillHasTarget = true;
-                break;
+                targetLocked = collisionInfo.IsTargetLocked;
+                if (targetLocked) break;
             }
             //update the cursor
-            SetCursorState(stillHasTarget ? CursorState.InRange : CursorState.Normal);
+            if (targetLocked)
+            {
+                SetCursorState(CursorState.Over);
+            }
+            else
+            {
+                SetCursorState(stillHasTarget ? CursorState.InRange : CursorState.Normal);    
+            }
         }
 
         //Set the cursor texture and updates the state
