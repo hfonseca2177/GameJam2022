@@ -125,7 +125,7 @@ MonoBehaviour:
   _jumpForce: 30
   _groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 320
   _groundCheckDistance: 0.5
   _range: 0
   _targetableMask:
@@ -134,6 +134,7 @@ MonoBehaviour:
   _enableGizmos: 0
   _gizmosColor: {r: 0, g: 1, b: 1, a: 1}
   _logAllEvents: 0
+  _playerDeathTime: 0
 --- !u!95 &5750737938282577513
 Animator:
   serializedVersion: 4
