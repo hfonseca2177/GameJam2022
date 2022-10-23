@@ -30,4 +30,10 @@
             OnAggroRange?.Invoke(player, _enemy);
             _enemy.CastSpell(player);
         }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (!other.CompareTag("Player")) return;
+            _enemy.StopCast();
+        }
     }

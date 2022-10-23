@@ -61,7 +61,7 @@ public class TargetableObject : MonoBehaviour
 
     }
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (!_enableGizmos) return;
         Gizmos.color = _gizmosColor;
@@ -86,10 +86,6 @@ public class TargetableObject : MonoBehaviour
     private void OnMouseExit()
     {
         OnMouseExitTargetable?.Invoke(this);
-        /*if (IsValidTarget())
-        {
-            OnMouseExitTargetable?.Invoke(this);
-        }*/
     }
 
     #endregion

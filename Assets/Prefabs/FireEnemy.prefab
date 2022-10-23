@@ -191,8 +191,9 @@ MonoBehaviour:
   _launchPosition: {fileID: 5589212062505010225}
   _projectile: {fileID: 7424280802050974460, guid: bdfbb15c766487049afc6917a407ff4e, type: 3}
   _cooldown: 4
-  _isCastOnce: 0
+  _isChannel: 0
   _deathTime: 1
+  _spellClip: {fileID: 8300000, guid: 8b5b8830add06bd43a8550894948a31d, type: 3}
 --- !u!114 &5932264871879878916
 MonoBehaviour:
   m_ObjectHideFlags: 0

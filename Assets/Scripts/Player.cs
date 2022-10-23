@@ -77,7 +77,7 @@ public class Player : MonoBehaviour
     }
     
     
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (!_enableGizmos) return;
         Gizmos.color = _gizmosColor;
@@ -127,9 +127,7 @@ public class Player : MonoBehaviour
     public void Displace(Vector2 newPosition)
     {
         if(_logAllEvents) Debug.Log("Displace");
-        //_rigidbody2D.MovePosition(newPosition);
         _rigidbody2D.transform.position = newPosition;
-        //_rigidbody2D.velocity = Vector2.zero;
     }
     
     private void OnTargetClickEvent(TargetableObject targetable)
@@ -164,11 +162,8 @@ public class Player : MonoBehaviour
         Collider2D hit = Physics2D.OverlapCircle(transform.position, _range, _targetableMask);
         if (hit != null)
         {
-            /*TargetableObject[] targetableObjects = hit.GetComponents<TargetableObject>();
-            OnHasAvailableTarget?.Invoke(this, targetableObjects);*/
             OnHasAvailableTarget?.Invoke(this);
-        }
-            
+        }   
     }
     
 

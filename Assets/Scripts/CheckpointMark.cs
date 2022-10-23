@@ -10,12 +10,13 @@
     {
 
         public static Action<Vector2> OnCheckpointEnter;
+        public Vector2 Position => transform.position;
 
         private void OnTriggerEnter2D(Collider2D col)
         {
             if (col.CompareTag("Player"))
             {
-                OnCheckpointEnter?.Invoke(transform.position);
+                OnCheckpointEnter?.Invoke(Position);
             }
         }
     }

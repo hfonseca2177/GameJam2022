@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -10,11 +7,14 @@ public class GameManager : MonoBehaviour
 {
 
     [SerializeField] private Checkpoint _checkpoint;
+    [SerializeField] private CheckpointMark _initialCheckPoint;
+    
     
     #region BuiltinMethods
 
     private void OnEnable()
     {
+        _checkpoint.SetCheckpointPosition(_initialCheckPoint.Position);
         CheckpointMark.OnCheckpointEnter += UpdateCheckpointEvent;
         Player.OnDeath += OnPlayerDeathEvent;
     }

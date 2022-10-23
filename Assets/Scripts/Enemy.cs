@@ -11,12 +11,14 @@ public class Enemy : TargetableObject
     [SerializeField] private Transform _launchPosition;
     [SerializeField] private Projectile _projectile;
     [SerializeField] private float _cooldown = 4.0f;
-    [SerializeField] private bool _isCastOnce;
+    [SerializeField] private bool _isChannel;
     [SerializeField] private float _deathTime = 0.1f;
+    [SerializeField] private AudioClip _spellClip;
     private float _timeElapsed;
     private bool _isCooldownUp = true;
-    private bool _spellCasted = false;
+    private bool _spellCasted;
     private AnimationName _animationName;
+    
     
     public static Action<Enemy> OnDeath;
     public static Action<Enemy> OnCastSpell;
@@ -30,32 +32,45 @@ public class Enemy : TargetableObject
     protected override void Update()
     {
         base.Update();
-        if (_isCastOnce) return;
-        _timeElapsed += Time.deltaTime;
+        if (_isChannel) return;
         if (!_spellCasted) return;
+        _timeElapsed += Time.deltaTime;
         CheckCooldown();
     }
 
     private void CheckCooldown()
     {
-        if (_timeElapsed > _cooldown)
-        {
-            _isCooldownUp = true;
-            _spellCasted = false;
-            _timeElapsed = 0.0f;
-        }
-        else
-        {
-            _isCooldownUp = false;
-        }
+        if (_timeElapsed < _cooldown) return;
+        _isCooldownUp = true;
+        _spellCasted = false;
+        _timeElapsed = 0.0f;
     }
 
     public void CastSpell(Player player)
     {
-        if (!_isCooldownUp || (_isCastOnce && _spellCasted)) return;
-        Projectile projectile = Instantiate(_projectile, _launchPosition.position, _launchPosition.rotation);
-        _spellCasted = true;
+        if (!_isCooldownUp || (_spellCasted)) return;
+        if (_isChannel)
+        {
+            _projectile.gameObject.SetActive(true);
+            _spellCasted = true;
+        }
+        else
+        {
+            Projectile projectile = Instantiate(_projectile, _launchPosition.position, _launchPosition.rotation);
+            _spellCasted = true;
+            _timeElapsed = 0;
+            _isCooldownUp = false;
+        }
         OnCastSpell?.Invoke(this);
+    }
+
+    public void StopCast()
+    {
+        if (_isChannel)
+        {
+            _projectile.gameObject.SetActive(false);
+        }
+        _spellCasted = false;
     }
 
     private void OnCollisionEnter2D(Collision2D col)
@@ -80,5 +95,10 @@ public class Enemy : TargetableObject
         _animationName.PlayDeath();
         yield return new WaitForSeconds(_deathTime);
         OnDeath?.Invoke(this);
+    }
+
+    public AudioClip GetSpellClip()
+    {
+        return _spellClip;
     }
 }

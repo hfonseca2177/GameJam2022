@@ -250,8 +250,9 @@ MonoBehaviour:
   _launchPosition: {fileID: 3551986845157234018}
   _projectile: {fileID: 4613169802175291233, guid: 648fcf6252e04d74ab5790d169baae2f, type: 3}
   _cooldown: 4
-  _isCastOnce: 0
+  _isChannel: 0
   _deathTime: 0
+  _spellClip: {fileID: 8300000, guid: 4f6938393eedde5418350c4d96579c41, type: 3}
 --- !u!95 &3551986844597921408
 Animator:
   serializedVersion: 4

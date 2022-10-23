@@ -25,7 +25,6 @@ public class Projectile : TargetableObject
         Player player = col.gameObject.GetComponent<Player>();
         OnProjectileHit?.Invoke(this, player);
         player.TakeDamage();
-        //Dissipate();
     }
 
     private void Start()
@@ -36,11 +35,10 @@ public class Projectile : TargetableObject
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
         _timeElapsed += Time.deltaTime;
         CheckLifeTime();
-        
     }
     
     
@@ -54,6 +52,7 @@ public class Projectile : TargetableObject
         if (_timeLife <= IgnoreTimeLife) return;
         if (_timeElapsed > _timeLife)
         {
+            Debug.Log("Dissipate was called");
             Dissipate();
         }
     }
